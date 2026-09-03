@@ -588,6 +588,7 @@ function App() {
         body: JSON.stringify(caseData)
       });
       const insertedRows = await insertRes.json();
+      if (!insertRes.ok) { throw new Error(`[${insertRes.status}] ` + (insertedRows && (insertedRows.message || insertedRows.hint || insertedRows.details) || JSON.stringify(insertedRows))); }
       if (Array.isArray(insertedRows) && insertedRows[0]) setCaseId(insertedRows[0].id);
       setAiText(ai);
       setCaseCode(code);
@@ -641,13 +642,14 @@ function App() {
         body: JSON.stringify(caseData)
       });
       const insertedRows = await insertRes.json();
+      if (!insertRes.ok) { throw new Error(`[${insertRes.status}] ` + (insertedRows && (insertedRows.message || insertedRows.hint || insertedRows.details) || JSON.stringify(insertedRows))); }
       if (Array.isArray(insertedRows) && insertedRows[0]) setCaseId(insertedRows[0].id);
       setCaseCode(code);
       setProofDone(!!payment_proof_url);
       setProofFile(null);
       setView("success");
     } catch (e) {
-      setErrors({ submit: lang === "ar" ? "\u062A\u0639\u0630\u0651\u0631 \u0627\u0644\u0625\u0631\u0633\u0627\u0644. \u062A\u0623\u0643\u062F\u064A \u0645\u0646 \u0627\u0644\u0627\u062A\u0635\u0627\u0644 \u0628\u0627\u0644\u0625\u0646\u062A\u0631\u0646\u062A \u0648\u062D\u0627\u0648\u0644\u064A \u0645\u0631\u0629 \u0623\u062E\u0631\u0649." : "Sending failed. Please check your connection and try again." });
+      setErrors({ submit: (lang === "ar" ? "\u062A\u0639\u0630\u0651\u0631 \u0627\u0644\u0625\u0631\u0633\u0627\u0644: " : "Sending failed: ") + (e && e.message ? e.message : String(e)) });
       setView("chatInfo");
     } finally {
       setSubmitting(false);
@@ -821,6 +823,7 @@ function App() {
         body: JSON.stringify(payload)
       });
       const insertedRows = await insertRes.json();
+      if (!insertRes.ok) { throw new Error(`[${insertRes.status}] ` + (insertedRows && (insertedRows.message || insertedRows.hint || insertedRows.details) || JSON.stringify(insertedRows))); }
       if (Array.isArray(insertedRows) && insertedRows[0]) setApptId(insertedRows[0].id);
       setApptCode(code);
       setProofDone(!!payment_proof_url);
