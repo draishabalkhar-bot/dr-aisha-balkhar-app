@@ -339,7 +339,7 @@ const T = {
     startChatBtn: "Chat with the medical assistant"
   }
 };
-const Card = ({ children, style }) => /* @__PURE__ */ React.createElement("div", { style: { background: C.card, borderRadius: 18, border: `1px solid ${C.border}`, boxShadow: "0 2px 14px rgba(30,122,111,0.06)", ...style } }, children);
+const Card = ({ children, style, onClick }) => /* @__PURE__ */ React.createElement("div", { onClick, style: { background: C.card, borderRadius: 18, border: `1px solid ${C.border}`, boxShadow: "0 2px 14px rgba(30,122,111,0.06)", ...style } }, children);
 const Button = ({ children, onClick, variant = "primary", style, disabled }) => {
   const base = {
     padding: "13px 22px",
