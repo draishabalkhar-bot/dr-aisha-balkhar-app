@@ -757,7 +757,17 @@ function App() {
     a4.click();
     document.body.removeChild(a4);
   }
-  function exportCsv() {
+  function loadXlsxLib() {
+    return new Promise((res, rej) => {
+      if (window.XLSX) return res(window.XLSX);
+      const sc = document.createElement("script");
+      sc.src = "https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js";
+      sc.onload = () => window.XLSX ? res(window.XLSX) : rej(new Error("xlsx"));
+      sc.onerror = () => rej(new Error("xlsx"));
+      document.head.appendChild(sc);
+    });
+  }
+  async function exportCsv() {
     setAdminMsg("");
     try {
       const from = expFrom ? new Date(expFrom + "T00:00:00") : null;
@@ -794,17 +804,15 @@ function App() {
       if (rows.length === 0) { setAdminMsg(t.noRows); return; }
       rows.sort((x, y) => x[0].localeCompare(y[0]));
       const head = [t.colDate, t.colKind, t.colCode, t.colName, t.colPhone, t.colService, t.colPaid, t.colStatus];
-      const cell = (v) => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`;
-      const csv = "\uFEFF" + "sep=;\r\n" + [head, ...rows].map((r) => r.map(cell).join(";")).join("\r\n");
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const a3 = document.createElement("a");
-      const href = URL.createObjectURL(blob);
-      a3.href = href;
-      a3.download = `records_${expFrom || "all"}_${expTo || "all"}.csv`;
-      document.body.appendChild(a3);
-      a3.click();
-      document.body.removeChild(a3);
-      setTimeout(() => URL.revokeObjectURL(href), 4000);
+      setAdminMsg(t.uploading);
+      const XL = await loadXlsxLib();
+      const data = [head, ...rows].map((r) => r.map((v) => String(v == null ? "" : v)));
+      const ws = XL.utils.aoa_to_sheet(data);
+      ws["!cols"] = [{ wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 22 }, { wch: 15 }, { wch: 22 }, { wch: 11 }, { wch: 13 }];
+      ws["!views"] = [{ RTL: lang === "ar" }];
+      const wb = XL.utils.book_new();
+      XL.utils.book_append_sheet(wb, ws, "records");
+      XL.writeFile(wb, `records_${expFrom || "all"}_${expTo || "all"}.xlsx`);
       setAdminMsg(`${rows.length} ${t.resultsWord}`);
     } catch (e) { setAdminMsg(String(e && e.message ? e.message : e)); }
   }
