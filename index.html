@@ -584,11 +584,13 @@ function App() {
       caseData.ai_analysis = ai;
       const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/cases`, {
         method: "POST",
-        headers: { ...sbHeaders(), Prefer: "return=representation" },
+        headers: { ...sbHeaders(), Prefer: "return=minimal" },
         body: JSON.stringify(caseData)
       });
-      const insertedRows = await insertRes.json();
-      if (!insertRes.ok) { throw new Error(`[${insertRes.status}] ` + (insertedRows && (insertedRows.message || insertedRows.hint || insertedRows.details) || JSON.stringify(insertedRows))); }
+      const rawBody = await insertRes.text();
+      let insertedRows = null;
+      try { insertedRows = rawBody ? JSON.parse(rawBody) : null; } catch (parseErr) { insertedRows = rawBody; }
+      if (!insertRes.ok) { throw new Error(`[${insertRes.status}] ` + (insertedRows && (insertedRows.message || insertedRows.hint || insertedRows.details) || rawBody || "unknown")); }
       if (Array.isArray(insertedRows) && insertedRows[0]) setCaseId(insertedRows[0].id);
       setAiText(ai);
       setCaseCode(code);
@@ -638,11 +640,13 @@ function App() {
       };
       const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/cases`, {
         method: "POST",
-        headers: { ...sbHeaders(), Prefer: "return=representation" },
+        headers: { ...sbHeaders(), Prefer: "return=minimal" },
         body: JSON.stringify(caseData)
       });
-      const insertedRows = await insertRes.json();
-      if (!insertRes.ok) { throw new Error(`[${insertRes.status}] ` + (insertedRows && (insertedRows.message || insertedRows.hint || insertedRows.details) || JSON.stringify(insertedRows))); }
+      const rawBody = await insertRes.text();
+      let insertedRows = null;
+      try { insertedRows = rawBody ? JSON.parse(rawBody) : null; } catch (parseErr) { insertedRows = rawBody; }
+      if (!insertRes.ok) { throw new Error(`[${insertRes.status}] ` + (insertedRows && (insertedRows.message || insertedRows.hint || insertedRows.details) || rawBody || "unknown")); }
       if (Array.isArray(insertedRows) && insertedRows[0]) setCaseId(insertedRows[0].id);
       setCaseCode(code);
       setProofDone(!!payment_proof_url);
@@ -819,11 +823,13 @@ function App() {
       };
       const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/appointments`, {
         method: "POST",
-        headers: { ...sbHeaders(), Prefer: "return=representation" },
+        headers: { ...sbHeaders(), Prefer: "return=minimal" },
         body: JSON.stringify(payload)
       });
-      const insertedRows = await insertRes.json();
-      if (!insertRes.ok) { throw new Error(`[${insertRes.status}] ` + (insertedRows && (insertedRows.message || insertedRows.hint || insertedRows.details) || JSON.stringify(insertedRows))); }
+      const rawBody = await insertRes.text();
+      let insertedRows = null;
+      try { insertedRows = rawBody ? JSON.parse(rawBody) : null; } catch (parseErr) { insertedRows = rawBody; }
+      if (!insertRes.ok) { throw new Error(`[${insertRes.status}] ` + (insertedRows && (insertedRows.message || insertedRows.hint || insertedRows.details) || rawBody || "unknown")); }
       if (Array.isArray(insertedRows) && insertedRows[0]) setApptId(insertedRows[0].id);
       setApptCode(code);
       setProofDone(!!payment_proof_url);
